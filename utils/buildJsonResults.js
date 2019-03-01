@@ -21,6 +21,8 @@ module.exports = function buildJsonResults (report, appDirectory, options) {
       return;
     }
 
+    const filePath = suite.filePath.replace(appDirectory, '');
+
     // Add <testsuite /> properties
     const testSuite = {
       'testsuite': [
@@ -29,7 +31,7 @@ module.exports = function buildJsonResults (report, appDirectory, options) {
             // not supported
             'errors': suite.errorCount,
             'failures': suite.fixableErrorCount,
-            'name': suite.filePath.replace(appDirectory, ''),
+            'name': filePath,
             'skipped': suite.warningCount,
             'tests': suite.errorCount + suite.warningCount,
             'time': 1,
@@ -41,12 +43,13 @@ module.exports = function buildJsonResults (report, appDirectory, options) {
 
     // Iterate through test cases
     suite.messages.forEach((tc) => {
+      const tcWithFilePath = { ...tc, filePath };
       const testCase = {
         'testcase': [
           {
             '_attr': {
-              'classname': buildTemplate(options.classNameTemplate, tc),
-              'name': buildTemplate(options.titleTemplate, tc),
+              'classname': buildTemplate(options.classNameTemplate, tcWithFilePath),
+              'name': buildTemplate(options.titleTemplate, tcWithFilePath),
               'time': 1
             }
           }
